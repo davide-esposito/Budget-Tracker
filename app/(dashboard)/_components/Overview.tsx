@@ -19,7 +19,7 @@ export default function Overview({
   });
   return (
     <>
-      <div className="container flex flex-wrap items-end justify-between gap-2 p-6">
+      <div className="container flex flex-wrap items-end justify-between gap-2 py-6">
         <h2 className="text-3xl font-bold">Overview</h2>
         <div className="flex items-center gap-3">
           <DateRangePicker
