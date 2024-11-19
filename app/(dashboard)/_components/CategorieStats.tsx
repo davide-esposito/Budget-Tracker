@@ -9,6 +9,7 @@ import React, { useMemo } from "react";
 import { GetCategorieStatsResponseType } from "../../api/stats/categories/route";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@/components/ui/progress";
 
 interface Props {
   userSettings: UserSettings;
@@ -103,6 +104,7 @@ function CategoriesCard({
                         {formatter.format(amount)}
                       </span>
                     </div>
+                    <Progress value={percentage} indicator={type === "income" ? "bg-emerald-500" : "bg-rose-500"}/>
                   </div>
                 );
               })}
