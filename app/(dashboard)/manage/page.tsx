@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { Category } from "@prisma/client";
+import DeleteCategoryDialog from "../_components/DeleteCategoryDialog";
 
 export default function page() {
   return (
@@ -61,7 +62,7 @@ function CategoryList({ type }: { type: TransactionType }) {
   const dataAvailable = categoriesQuery.data && categoriesQuery.data.length > 0;
 
   return (
-    <SkeletonWrapper isLoading={categoriesQuery.isFetching}>
+    <SkeletonWrapper isLoading={categoriesQuery.isLoading}>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between gap-2">
@@ -132,13 +133,18 @@ function CategoryCard({ category }: { category: Category }) {
         </span>
         <span>{category.name}</span>
       </div>
-      <Button
-        className="flex w-full border-separate items-center gap-2 rounded-t-none text-muted-foreground hover:bg-rose-500/20"
-        variant={"secondary"}
-      >
-        <TrashIcon className="h-4 w-4" />
-        Remove
-      </Button>
+      <DeleteCategoryDialog
+        category={category}
+        trigger={
+          <Button
+            className="flex w-full border-separate items-center gap-2 rounded-t-none text-muted-foreground hover:bg-rose-500/20"
+            variant={"secondary"}
+          >
+            <TrashIcon className="h-4 w-4" />
+            Remove
+          </Button>
+        }
+      />
     </div>
   );
 }
