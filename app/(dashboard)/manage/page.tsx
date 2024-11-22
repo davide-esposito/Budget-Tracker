@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 import { Category } from "@prisma/client";
 import DeleteCategoryDialog from "../_components/DeleteCategoryDialog";
 
-export default function page() {
+export default function ManagePage() {
   return (
     <>
       <div className="border-b bg-card">

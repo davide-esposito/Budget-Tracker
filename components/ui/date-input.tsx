@@ -208,7 +208,7 @@ export default function DateInput({ value, onChange }: DateInputProps) {
           }
         }}
         onBlur={handleBlur("month")}
-        className="p-0 outline-none w-6 border-none text-center"
+        className="p-0 outline-none w-6 border-none text-center bg-transparent"
         placeholder="M"
       />
       <span className="opacity-20 -mx-px">/</span>
@@ -226,7 +226,7 @@ export default function DateInput({ value, onChange }: DateInputProps) {
           }
         }}
         onBlur={handleBlur("day")}
-        className="p-0 outline-none w-7 border-none text-center"
+        className="p-0 outline-none w-7 border-none text-center bg-transparent"
         placeholder="D"
       />
       <span className="opacity-20 -mx-px">/</span>
@@ -244,7 +244,7 @@ export default function DateInput({ value, onChange }: DateInputProps) {
           }
         }}
         onBlur={handleBlur("year")}
-        className="p-0 outline-none w-12 border-none text-center"
+        className="p-0 outline-none w-12 border-none text-center bg-transparent"
         placeholder="YYYY"
       />
     </div>
