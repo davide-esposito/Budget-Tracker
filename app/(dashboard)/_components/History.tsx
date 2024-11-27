@@ -20,7 +20,6 @@ import {
 } from "recharts";
 import { cn } from "@/lib/utils";
 import CountUp from "react-countup";
-import { format } from "path";
 
 export default function History({
   userSettings,

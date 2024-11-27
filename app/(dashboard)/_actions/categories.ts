@@ -9,19 +9,21 @@ import {
 } from "../../../schema/categories";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { validateForm } from "@/lib/utils";
 
-export async function CreateCategory(form: CreateCategorySchemaType) {
-  const parsedBody = CreateCategorySchema.safeParse(form);
-  if (!parsedBody.success) {
-    throw new Error("bad request");
-  }
-
+async function requireUser() {
   const user = await currentUser();
   if (!user) {
     redirect("/sign-in");
   }
+  return user;
+}
 
-  const { name, icon, type } = parsedBody.data;
+export async function CreateCategory(form: CreateCategorySchemaType) {
+  const { name, icon, type } = validateForm(CreateCategorySchema, form);
+
+  const user = await requireUser();
+
   return await prisma.category.create({
     data: {
       userId: user.id,
@@ -33,22 +35,16 @@ export async function CreateCategory(form: CreateCategorySchemaType) {
 }
 
 export async function DeleteCategory(form: DeleteCategorySchemaType) {
-  const parsedBody = DeleteCategorySchema.safeParse(form);
-  if (!parsedBody.success) {
-    throw new Error("bad request");
-  }
+  const { name, type } = validateForm(DeleteCategorySchema, form);
 
-  const user = await currentUser();
-  if (!user) {
-    redirect("/sign-in");
-  }
+  const user = await requireUser();
 
   return await prisma.category.delete({
     where: {
       name_userId_type: {
         userId: user.id,
-        name: parsedBody.data.name,
-        type: parsedBody.data.type,
+        name,
+        type,
       },
     },
   });
