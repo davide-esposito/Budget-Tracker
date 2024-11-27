@@ -1,4 +1,5 @@
 "use server";
+
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
@@ -6,22 +7,19 @@ import {
   CreateTransactionSchema,
   CreateTransactionSchemaType,
 } from "../../../schema/transaction";
-import { parse } from "path";
+import { validateForm } from "@/lib/utils";
 
 export async function CreateTransaction(form: CreateTransactionSchemaType) {
-  const parsedBody = CreateTransactionSchema.safeParse(form);
-  console.log(parsedBody);
-
-  if (!parsedBody.success) {
-    throw new Error(parsedBody.error.message);
-  }
+  const { amount, category, date, description, type } = validateForm(
+    CreateTransactionSchema,
+    form
+  );
 
   const user = await currentUser();
   if (!user) {
     return redirect("/sign-in");
   }
 
-  const { amount, category, date, description, type } = parsedBody.data;
   const categoryRow = await prisma.category.findFirst({
     where: {
       userId: user.id,
