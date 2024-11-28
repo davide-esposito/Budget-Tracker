@@ -1,12 +1,12 @@
 "use client";
 
-import SkeletonWrapper from "@/components/SkeletonWrapper";
+import React, { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { UserSettings } from "@prisma/client";
 import { DatetoUTCDate, GetFormatterForCurrency } from "@/lib/helpers";
 import { TransactionType } from "@/lib/types";
-import { UserSettings } from "@prisma/client";
-import { useQuery } from "@tanstack/react-query";
-import React, { useMemo } from "react";
 import { GetCategorieStatsResponseType } from "../../api/stats/categories/route";
+import SkeletonWrapper from "@/components/SkeletonWrapper";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
@@ -25,14 +25,19 @@ export default function CategorieStats({ userSettings, from, to }: Props) {
         `/api/stats/categories?from=${DatetoUTCDate(from)}&to=${DatetoUTCDate(
           to
         )}`
-      ).then((res) => res.json()),
+      ).then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch category stats");
+        return res.json();
+      }),
+    retry: 1,
   });
 
-  const formatter = useMemo(() => {
-    return GetFormatterForCurrency(userSettings.currency);
-  }, [userSettings.currency]);
+  const formatter = useMemo(
+    () => GetFormatterForCurrency(userSettings.currency),
+    [userSettings.currency]
+  );
 
-  function renderCategoriesCard(type: TransactionType) {
+  function renderCategoryCard(type: TransactionType) {
     const filteredData =
       statsQuery.data?.filter((el) => el.type === type) || [];
     const total = filteredData.reduce(
@@ -49,39 +54,13 @@ export default function CategorieStats({ userSettings, from, to }: Props) {
         </CardHeader>
         <div className="flex items-center justify-between gap-2">
           {filteredData.length === 0 ? (
-            <div className="flex h-60 w-full flex-col items-center justify-center">
-              No data for the selected period
-              <p className="text-sm text-muted-foreground">
-                Try selecting a different period or try adding new{" "}
-                {type === "income" ? "incomes" : "expenses"}
-              </p>
-            </div>
+            renderEmptyState(type)
           ) : (
             <ScrollArea className="h-60 w-full px-4">
               <div className="flex w-full flex-col gap-4 p-4">
-                {filteredData.map((item) => (
-                  <div key={item.category} className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center text-gray-400">
-                        {item.categoryIcon} {item.category}
-                        <span className="ml-2 text-xs text-muted-foreground">
-                          (
-                          {(((item._sum.amount || 0) * 100) / total).toFixed(0)}
-                          %)
-                        </span>
-                      </span>
-                      <span className="text-sm text-gray-400">
-                        {formatter.format(item._sum.amount || 0)}
-                      </span>
-                    </div>
-                    <Progress
-                      value={((item._sum.amount || 0) * 100) / total}
-                      indicator={
-                        type === "income" ? "bg-emerald-500" : "bg-rose-500"
-                      }
-                    />
-                  </div>
-                ))}
+                {filteredData.map((item) =>
+                  renderCategoryRow(item, type, total)
+                )}
               </div>
             </ScrollArea>
           )}
@@ -90,14 +69,62 @@ export default function CategorieStats({ userSettings, from, to }: Props) {
     );
   }
 
+  function renderEmptyState(type: TransactionType) {
+    return (
+      <div className="flex h-60 w-full flex-col items-center justify-center">
+        No data for the selected period
+        <p className="text-sm text-muted-foreground">
+          Try selecting a different period or try adding new{" "}
+          {type === "income" ? "incomes" : "expenses"}.
+        </p>
+      </div>
+    );
+  }
+
+  function renderCategoryRow(
+    item: GetCategorieStatsResponseType[number],
+    type: TransactionType,
+    total: number
+  ) {
+    const percentage = ((item._sum.amount || 0) * 100) / total;
+    return (
+      <div key={item.category} className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <span className="flex items-center text-gray-400">
+            {item.categoryIcon} {item.category}
+            <span className="ml-2 text-xs text-muted-foreground">
+              ({percentage.toFixed(0)}%)
+            </span>
+          </span>
+          <span className="text-sm text-gray-400">
+            {formatter.format(item._sum.amount || 0)}
+          </span>
+        </div>
+        <Progress
+          value={percentage}
+          indicator={type === "income" ? "bg-emerald-500" : "bg-rose-500"}
+        />
+      </div>
+    );
+  }
+
+  function renderErrorState() {
+    return (
+      <div className="flex h-80 w-full items-center justify-center">
+        <p className="text-sm text-red-500">Failed to load category stats.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex w-full flex-wrap gap-2 md:flex-nowrap">
-      <SkeletonWrapper isLoading={statsQuery.isFetching}>
-        {renderCategoriesCard("income")}
-      </SkeletonWrapper>
-      <SkeletonWrapper isLoading={statsQuery.isFetching}>
-        {renderCategoriesCard("expense")}
-      </SkeletonWrapper>
+      {statsQuery.isError
+        ? renderErrorState()
+        : ["income", "expense"].map((type) => (
+            <SkeletonWrapper key={type} isLoading={statsQuery.isFetching}>
+              {renderCategoryCard(type as TransactionType)}
+            </SkeletonWrapper>
+          ))}
     </div>
   );
 }
