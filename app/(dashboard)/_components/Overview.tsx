@@ -18,6 +18,22 @@ export default function Overview({
     from: startOfMonth(new Date()),
     to: new Date(),
   });
+
+  const handleDateRangeUpdate = (values: {
+    range: { from?: Date; to?: Date };
+  }) => {
+    const { from, to } = values.range;
+
+    if (!from || !to) return;
+
+    if (differenceInDays(to, from) > MAX_DATE_RANGE_DAYS) {
+      toast.error(`Date range cannot exceed ${MAX_DATE_RANGE_DAYS} days`);
+      return;
+    }
+
+    setDateRange({ from, to });
+  };
+
   return (
     <>
       <div className="container flex flex-wrap items-end justify-between gap-2 py-6">
@@ -27,19 +43,8 @@ export default function Overview({
             initialDateFrom={dateRange.from}
             initialDateTo={dateRange.to}
             showCompare={false}
-            onUpdate={(values) => {
-              const { from, to } = values.range;
-
-              if (!from || !to) return;
-              if (differenceInDays(to, from) > MAX_DATE_RANGE_DAYS) {
-                toast.error(
-                  `Date range cannot exceed ${MAX_DATE_RANGE_DAYS} days`
-                );
-                return;
-              }
-
-              setDateRange({ from, to });
-            }}
+            onUpdate={handleDateRangeUpdate}
+            aria-label="Select a date range for your overview"
           />
         </div>
       </div>
@@ -49,7 +54,6 @@ export default function Overview({
           from={dateRange.from}
           to={dateRange.to}
         />
-
         <CategorieStats
           userSettings={userSettings}
           from={dateRange.from}

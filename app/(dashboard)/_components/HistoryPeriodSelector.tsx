@@ -38,10 +38,15 @@ export default function HistoryPeriodSelector({
         <Tabs
           value={timeframe}
           onValueChange={(value) => setTimeframe(value as Timeframe)}
+          aria-label="Select timeframe"
         >
           <TabsList>
-            <TabsTrigger value={"year"}>Year</TabsTrigger>
-            <TabsTrigger value={"month"}>Month</TabsTrigger>
+            <TabsTrigger value="year" aria-label="Year timeframe">
+              Year
+            </TabsTrigger>
+            <TabsTrigger value="month" aria-label="Month timeframe">
+              Month
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </SkeletonWrapper>
@@ -85,10 +90,15 @@ function YearSelector({
         setPeriod({ month: period.month, year: parseInt(value) })
       }
     >
-      <SelectTrigger className="w-[180px]">
-        <SelectValue />
+      <SelectTrigger
+        className="w-[180px]"
+        aria-label="Select year"
+        aria-expanded="true"
+        aria-controls="year-options"
+      >
+        <SelectValue placeholder="Select Year" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent id="year-options">
         {years.map((year) => (
           <SelectItem key={year} value={year.toString()}>
             {year}
@@ -113,10 +123,15 @@ function MonthSelector({
         setPeriod({ month: parseInt(value), year: period.year })
       }
     >
-      <SelectTrigger className="w-[180px]">
-        <SelectValue />
+      <SelectTrigger
+        className="w-[180px]"
+        aria-label="Select month"
+        aria-expanded="true"
+        aria-controls="month-options"
+      >
+        <SelectValue placeholder="Select Month" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent id="month-options">
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((month) => {
           const monthStr = new Date(period.year, month, 1).toLocaleString(
             "default",
