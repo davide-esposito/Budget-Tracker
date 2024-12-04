@@ -11,9 +11,7 @@ export async function DeleteTransaction(id: string) {
   }
 
   const transaction = await prisma.transaction.findUnique({
-    where: {
-      id,
-    },
+    where: { id },
   });
 
   if (!transaction) {

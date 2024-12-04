@@ -26,7 +26,7 @@ export default function ManagePage() {
       <div className="border-b bg-card">
         <div className="container flex flex-wrap items-center justify-between gap-6 py-8">
           <div>
-            <p className="text-3xl font-bold">Manage</p>
+            <h1 className="text-3xl font-bold">Manage</h1>
             <p className="text-muted-foreground">
               Manage your account settings and categories
             </p>
@@ -38,7 +38,7 @@ export default function ManagePage() {
           <CardHeader>
             <CardTitle>Currency</CardTitle>
             <CardDescription>
-              Set your default currrency for transactions
+              Set your default currency for transactions
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -55,11 +55,15 @@ export default function ManagePage() {
 function CategoryList({ type }: { type: TransactionType }) {
   const categoriesQuery = useQuery({
     queryKey: ["categories", type],
-    queryFn: () =>
-      fetch(`/api/categories?type=${type}`).then((res) => res.json()),
+    queryFn: async () => {
+      const res = await fetch(`/api/categories?type=${type}`);
+      if (!res.ok) throw new Error("Failed to fetch categories");
+      return res.json();
+    },
+    retry: 1,
   });
 
-  const dataAvailable = categoriesQuery.data && categoriesQuery.data.length > 0;
+  const dataAvailable = categoriesQuery.data?.length > 0;
 
   return (
     <SkeletonWrapper isLoading={categoriesQuery.isLoading}>
@@ -68,9 +72,15 @@ function CategoryList({ type }: { type: TransactionType }) {
           <CardTitle className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               {type === "expense" ? (
-                <TrendingDown className="h-12 w-12 items-center rounded-lg bg-rose-400/10 p-2 text-rose-500" />
+                <TrendingDown
+                  className="h-12 w-12 rounded-lg bg-rose-400/10 p-2 text-rose-500"
+                  aria-hidden="true"
+                />
               ) : (
-                <TrendingUp className="h-12 w-12 items-center rounded-lg bg-emerald-400/10 p-2 text-emerald-500" />
+                <TrendingUp
+                  className="h-12 w-12 rounded-lg bg-emerald-400/10 p-2 text-emerald-500"
+                  aria-hidden="true"
+                />
               )}
               <div>
                 {type === "expense" ? "Expense" : "Income"} Categories
@@ -93,27 +103,9 @@ function CategoryList({ type }: { type: TransactionType }) {
           </CardTitle>
         </CardHeader>
         <Separator />
-        {!dataAvailable && (
-          <div className="flex h-40 w-full flex-col items-center justify-center">
-            <p>
-              No{" "}
-              <span
-                className={cn(
-                  "m-1",
-                  type === "income" ? "text-emerald-500" : "text-rose-500"
-                )}
-              >
-                {type}
-              </span>{" "}
-              categories yet
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Create a new category to get started
-            </p>
-          </div>
-        )}
+        {!dataAvailable && renderEmptyState(type)}
         {dataAvailable && (
-          <div className="grid grid-flow-row gap-2 p-2 sm:grid-flow-row sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-flow-row gap-2 p-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {categoriesQuery.data.map((category: Category) => (
               <CategoryCard category={category} key={category.name} />
             ))}
@@ -124,11 +116,40 @@ function CategoryList({ type }: { type: TransactionType }) {
   );
 }
 
+function renderEmptyState(type: TransactionType) {
+  return (
+    <div className="flex h-40 w-full flex-col items-center justify-center">
+      <p>
+        No{" "}
+        <span
+          className={cn(
+            "m-1",
+            type === "income" ? "text-emerald-500" : "text-rose-500"
+          )}
+        >
+          {type}
+        </span>{" "}
+        categories yet
+      </p>
+      <p className="text-sm text-muted-foreground">
+        Create a new category to get started
+      </p>
+    </div>
+  );
+}
+
 function CategoryCard({ category }: { category: Category }) {
   return (
-    <div className="flex border-separate flex-col justify-between rounded-md shadow-md shadow-black/[0.1] dark:shadow-white/[0.1]">
+    <div
+      className="flex flex-col justify-between rounded-md shadow-md shadow-black/[0.1] dark:shadow-white/[0.1]"
+      aria-label={`Category card for ${category.name}`}
+    >
       <div className="flex flex-col items-center gap-2 p-4">
-        <span className="text-3xl" role="img">
+        <span
+          className="text-3xl"
+          role="img"
+          aria-label={`${category.name} icon`}
+        >
           {category.icon}
         </span>
         <span>{category.name}</span>
@@ -137,8 +158,9 @@ function CategoryCard({ category }: { category: Category }) {
         category={category}
         trigger={
           <Button
-            className="flex w-full border-separate items-center gap-2 rounded-t-none text-muted-foreground hover:bg-rose-500/20"
-            variant={"secondary"}
+            className="flex w-full items-center gap-2 rounded-t-none text-muted-foreground hover:bg-rose-500/20"
+            variant="secondary"
+            aria-label={`Delete ${category.name} category`}
           >
             <TrashIcon className="h-4 w-4" />
             Remove

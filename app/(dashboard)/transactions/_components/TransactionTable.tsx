@@ -30,7 +30,6 @@ import { DataTableFacetedFilter } from "@/components/datatable/FacetedFilters";
 import DataTableViewOptions from "@/components/datatable/ColumnToggle";
 import { Button } from "@/components/ui/button";
 import { download, generateCsv, mkConfig } from "export-to-csv";
-import { format } from "path";
 import { DownloadIcon, MoreHorizontalIcon, TrashIcon } from "lucide-react";
 import {
   DropdownMenu,
@@ -40,7 +39,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { set } from "date-fns";
 import DeleteTransactionDialog from "./DeleteTransactionDialog";
 
 interface Props {
@@ -52,30 +50,31 @@ const emptyData: any[] = [];
 
 type TransactionHistoryRow = GetTransactionsHistoryResponseType[0];
 
+// Spaltenkonfiguration für die Tabelle
 const columns: ColumnDef<TransactionHistoryRow>[] = [
   {
     accessorKey: "category",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Category" />
     ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
+    filterFn: (row, id, value) => value.includes(row.getValue(id)),
+    cell: ({ row }) => {
+      return (
+        <div className="flex gap-2 capitalize">
+          {row.original.categoryIcon}
+          <div className="capitalize">{row.original.category}</div>
+        </div>
+      );
     },
-    cell: ({ row }) => (
-      <div className="flex gap-2 capitalize">
-        {row.original.categoryIcon}
-        <div className="capitalize">{row.original.category}</div>
-      </div>
-    ),
   },
   {
     accessorKey: "description",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Description" />
     ),
-    cell: ({ row }) => (
-      <div className="capitalize">{row.original.description}</div>
-    ),
+    cell: ({ row }) => {
+      return <div className="capitalize">{row.original.description}</div>;
+    },
   },
   {
     accessorKey: "date",
@@ -96,37 +95,41 @@ const columns: ColumnDef<TransactionHistoryRow>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Type" />
     ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
+    filterFn: (row, id, value) => value.includes(row.getValue(id)),
+    cell: ({ row }) => {
+      return (
+        <div
+          className={cn(
+            "capitalize rounded-lg text-center p-2",
+            row.original.type === "income" &&
+              "bg-emerald-400/10 text-emerald-500",
+            row.original.type === "expense" && "bg-rose-400/10 text-rose-500"
+          )}
+        >
+          {row.original.type}
+        </div>
+      );
     },
-    cell: ({ row }) => (
-      <div
-        className={cn(
-          "capitalize rounded-lg text-center p-2",
-          row.original.type === "income" &&
-            "bg-emerald-400/10 text-emerald-500",
-          row.original.type === "expense" && "bg-rose-400/10 text-rose-500"
-        )}
-      >
-        {row.original.type}
-      </div>
-    ),
   },
   {
     accessorKey: "amount",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Amount" />
     ),
-    cell: ({ row }) => (
-      <p className="text-md rounded-lg bg-gray-400/5 p-2 text-center font-medium">
-        {row.original.formattedAmount}
-      </p>
-    ),
+    cell: ({ row }) => {
+      return (
+        <p className="text-md rounded-lg bg-gray-400/5 p-2 text-center font-medium">
+          {row.original.formattedAmount}
+        </p>
+      );
+    },
   },
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => <RowActions transaction={row.original} />,
+    cell: ({ row }) => {
+      return <RowActions transaction={row.original} />;
+    },
   },
 ];
 
@@ -178,8 +181,7 @@ export default function TransactionTable({ from, to }: Props) {
         label: `${transaction.categoryIcon} ${transaction.category}`,
       });
     });
-    const uniqueCategories = new Set(categoriesMap.values());
-    return Array.from(uniqueCategories);
+    return Array.from(categoriesMap.values());
   }, [history.data]);
 
   return (
@@ -198,10 +200,7 @@ export default function TransactionTable({ from, to }: Props) {
               title="Type"
               column={table.getColumn("type")}
               options={[
-                {
-                  label: "Income",
-                  value: "income",
-                },
+                { label: "Income", value: "income" },
                 { label: "Expense", value: "expense" },
               ]}
             />
@@ -237,28 +236,23 @@ export default function TransactionTable({ from, to }: Props) {
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    );
-                  })}
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
                 </TableRow>
               ))}
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
+                  <TableRow key={row.id}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(
@@ -327,9 +321,7 @@ function RowActions({ transaction }: { transaction: TransactionHistoryRow }) {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="flex items-center gap-2"
-            onSelect={() => {
-              setShowDeleteDialog((prev) => !prev);
-            }}
+            onSelect={() => setShowDeleteDialog(true)}
           >
             <TrashIcon className="w-4 h-4 text-muted-foreground" />
             Delete

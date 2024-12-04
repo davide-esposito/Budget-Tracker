@@ -22,52 +22,56 @@ export default function StatsCards({ from, to, userSettings }: Props) {
     queryFn: () =>
       fetch(
         `/api/stats/balance?from=${DatetoUTCDate(from)}&to=${DatetoUTCDate(to)}`
-      ).then((res) => res.json()),
+      ).then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch stats data");
+        }
+        return res.json();
+      }),
+    retry: 1,
   });
 
-  const formatter = useMemo(() => {
-    return GetFormatterForCurrency(userSettings.currency);
-  }, [userSettings.currency]);
+  const formatter = useMemo(
+    () => GetFormatterForCurrency(userSettings.currency),
+    [userSettings.currency]
+  );
 
   const income = statsQuery.data?.income || 0;
   const expense = statsQuery.data?.expense || 0;
-
   const balance = income - expense;
+
+  const renderStatCard = (title: string, value: number, icon: ReactNode) => (
+    <SkeletonWrapper isLoading={statsQuery.isFetching}>
+      <StatCard formatter={formatter} value={value} title={title} icon={icon} />
+    </SkeletonWrapper>
+  );
 
   return (
     <div className="relative flex w-full flex-wrap gap-2 md:flex-nowrap">
-      <SkeletonWrapper isLoading={statsQuery.isFetching}>
-        <StatCard
-          formatter={formatter}
-          value={income}
-          title="Income"
-          icon={
-            <TrendingUp className="h-12 w-12 items-center rounded-lg p-2 text-emerald-500 bg-emerald-400/10" />
-          }
+      {renderStatCard(
+        "Income",
+        income,
+        <TrendingUp
+          className="h-12 w-12 rounded-lg p-2 text-emerald-500 bg-emerald-400/10"
+          aria-hidden="true"
         />
-      </SkeletonWrapper>
-
-      <SkeletonWrapper isLoading={statsQuery.isFetching}>
-        <StatCard
-          formatter={formatter}
-          value={expense}
-          title="Expense"
-          icon={
-            <TrendingDown className="h-12 w-12 items-center rounded-lg p-2 text-rose-500 bg-rose-400/10" />
-          }
+      )}
+      {renderStatCard(
+        "Expense",
+        expense,
+        <TrendingDown
+          className="h-12 w-12 rounded-lg p-2 text-rose-500 bg-rose-400/10"
+          aria-hidden="true"
         />
-      </SkeletonWrapper>
-
-      <SkeletonWrapper isLoading={statsQuery.isFetching}>
-        <StatCard
-          formatter={formatter}
-          value={balance}
-          title="Balance"
-          icon={
-            <Wallet className="h-12 w-12 items-center rounded-lg p-2 text-violet-500 bg-violet-400/10" />
-          }
+      )}
+      {renderStatCard(
+        "Balance",
+        balance,
+        <Wallet
+          className="h-12 w-12 rounded-lg p-2 text-violet-500 bg-violet-400/10"
+          aria-hidden="true"
         />
-      </SkeletonWrapper>
+      )}
     </div>
   );
 }
@@ -84,14 +88,15 @@ function StatCard({
   icon: ReactNode;
 }) {
   const formatFn = useCallback(
-    (value: number) => {
-      return formatter.format(value);
-    },
+    (value: number) => formatter.format(value),
     [formatter]
   );
 
   return (
-    <Card className="flex h-24 w-full items-center gap-2 p-4">
+    <Card
+      className="flex h-24 w-full items-center gap-2 p-4"
+      aria-label={`Stat card for ${title}`}
+    >
       {icon}
       <div className="flex flex-col items-start gap-0">
         <p className="text-muted-foreground">{title}</p>

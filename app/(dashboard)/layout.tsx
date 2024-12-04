@@ -1,11 +1,15 @@
+"use client";
+
 import Navbar from "@/components/Navbar";
 import React, { ReactNode } from "react";
 
-export default function layout({ children }: { children: ReactNode }) {
+export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="relative flex h-screen w-full flex-col">
-      <Navbar />
-      <div className="w-full">{children}</div>
+      <Navbar aria-label="Main navigation bar" />
+      <main className="w-full" role="main">
+        {children}
+      </main>
     </div>
   );
 }

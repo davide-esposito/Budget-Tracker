@@ -12,8 +12,6 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { tr } from "date-fns/locale";
-import { Delete } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
 import { DeleteTransaction } from "../_actions/deleteTransaction";
@@ -30,22 +28,33 @@ export default function DeleteTransactionDialog({
   transactionId,
 }: Props) {
   const queryClient = useQueryClient();
+
   const deleteMutation = useMutation({
     mutationFn: DeleteTransaction,
     onSuccess: async () => {
       toast.success(`Transaction deleted successfully 🎉`, {
         id: transactionId,
       });
+
       await queryClient.invalidateQueries({
         queryKey: ["transactions"],
       });
+
+      setOpen(false);
     },
     onError: () => {
-      toast.error("An error occurred while deleting the category", {
+      toast.error("An error occurred while deleting the transaction", {
         id: transactionId,
       });
     },
   });
+
+  const handleDelete = () => {
+    toast.loading(`Deleting transaction...`, { id: transactionId });
+
+    deleteMutation.mutate(transactionId);
+  };
+
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogContent>
@@ -58,14 +67,12 @@ export default function DeleteTransactionDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel aria-label="Cancel deletion">
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
-            onClick={() => {
-              toast.loading(`Deleting transaction...`, {
-                id: transactionId,
-              });
-              deleteMutation.mutate(transactionId);
-            }}
+            aria-label="Confirm deletion"
+            onClick={handleDelete}
           >
             Continue
           </AlertDialogAction>
