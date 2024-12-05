@@ -145,8 +145,9 @@ export default function TransactionTable({ from, to }: Props) {
   });
 
   const categoriesOptions = useMemo(() => {
+    if (!history.data) return [];
     const categoriesMap = new Map();
-    history.data?.forEach((transaction) => {
+    history.data.forEach((transaction) => {
       categoriesMap.set(transaction.category, {
         value: transaction.category,
         label: `${transaction.categoryIcon} ${transaction.category}`,
@@ -163,8 +164,12 @@ export default function TransactionTable({ from, to }: Props) {
       sorting,
       columnFilters,
     },
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    onSortingChange: (newSorting) => {
+      setSorting(newSorting);
+    },
+    onColumnFiltersChange: (newFilters) => {
+      setColumnFilters(newFilters);
+    },
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

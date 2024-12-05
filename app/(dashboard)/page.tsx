@@ -9,6 +9,7 @@ import History from "./_components/History";
 
 export default async function page() {
   const user = await currentUser();
+
   if (!user) {
     redirect("/sign-in");
   }
@@ -25,9 +26,14 @@ export default async function page() {
 
   return (
     <div className="h-full bg-background">
-      <div className="border-b bg-card ">
-        <div className="container flex flex-wrap items-center justify-between gap-6 py-6">
-          <p className="text-3xl font-bold">Hello, {user.firstName}! 👋</p>
+      <div className="border-b bg-card">
+        <div
+          className="container flex flex-wrap items-center justify-between gap-6 py-6"
+          aria-label="Page header with greeting and transaction actions"
+        >
+          <p className="text-3xl font-bold" aria-live="polite">
+            Hello, {user.firstName}! 👋
+          </p>
           <div className="flex items-center gap-3">
             <CreateTransactionDialog
               type={"income"}
@@ -35,6 +41,7 @@ export default async function page() {
                 <Button
                   variant={"outline"}
                   className="border-emerald-500 bg-emerald-950 text-white hover:bg-emerald-700 hover:text-white"
+                  aria-label="Create a new income transaction"
                 >
                   New income 🤑
                 </Button>
@@ -46,6 +53,7 @@ export default async function page() {
                 <Button
                   variant={"outline"}
                   className="border-rose-500 bg-rose-950 text-white hover:bg-rose-700 hover:text-white"
+                  aria-label="Create a new expense transaction"
                 >
                   New expense 🥲
                 </Button>
@@ -54,8 +62,16 @@ export default async function page() {
           </div>
         </div>
       </div>
-      <Overview userSettings={userSettings} />
-      <History userSettings={userSettings} />
+
+      <Overview
+        userSettings={userSettings}
+        aria-label="Overview of financial data"
+      />
+
+      <History
+        userSettings={userSettings}
+        aria-label="Transaction history with filters and sorting"
+      />
     </div>
   );
 }

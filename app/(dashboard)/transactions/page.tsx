@@ -18,8 +18,11 @@ export default function TransactionsPage() {
       <div className="border-b bg-card">
         <div className="container flex flex-wrap items-center justify-between gap-6 py-8">
           <div>
-            <p className="text-3xl font-bold">Transactions history</p>
+            <p className="text-3xl font-bold" aria-label="Page title">
+              Transactions history
+            </p>
           </div>
+
           <DateRangePicker
             initialDateFrom={dateRange.from}
             initialDateTo={dateRange.to}
@@ -28,6 +31,7 @@ export default function TransactionsPage() {
               const { from, to } = values.range;
 
               if (!from || !to) return;
+
               if (differenceInDays(to, from) > MAX_DATE_RANGE_DAYS) {
                 toast.error(
                   `Date range cannot exceed ${MAX_DATE_RANGE_DAYS} days`
@@ -37,9 +41,11 @@ export default function TransactionsPage() {
 
               setDateRange({ from, to });
             }}
+            aria-label="Select date range for transactions"
           />
         </div>
       </div>
+
       <div className="container">
         <TransactionTable from={dateRange.from} to={dateRange.to} />
       </div>
