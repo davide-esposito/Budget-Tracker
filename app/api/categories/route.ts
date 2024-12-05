@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { validateForm } from "@/lib/utils";
 
 export async function GET(request: Request) {
   const user = await currentUser();
@@ -12,15 +13,16 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const paramType = searchParams.get("type");
 
-  const validator = z.enum(["income", "expense"]).nullable();
+  const TypeSchema = z.enum(["income", "expense"]).nullable();
 
-  const queryParams = validator.safeParse(paramType);
-
-  if (!queryParams.success) {
-    return Response.json(queryParams.error, { status: 400 });
+  let type: "income" | "expense" | null = null;
+  try {
+    type = validateForm(TypeSchema, paramType);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return Response.json({ error: message }, { status: 400 });
   }
 
-  const type = queryParams.data;
   const categories = await prisma.category.findMany({
     where: {
       userId: user.id,
@@ -30,5 +32,6 @@ export async function GET(request: Request) {
       name: "asc",
     },
   });
+
   return Response.json(categories);
 }
