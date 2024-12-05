@@ -7,24 +7,39 @@ import { GetFormatterForCurrency } from "@/lib/helpers";
 export async function GET(request: Request) {
   const user = await currentUser();
   if (!user) {
-    redirect("/sign-in");
+    return redirect("/sign-in");
   }
+
   const { searchParams } = new URL(request.url);
   const from = searchParams.get("from");
   const to = searchParams.get("to");
 
   const queryParams = OverviewQuerySchema.safeParse({ from, to });
-
   if (!queryParams.success) {
-    return Response.json(queryParams.error.message, { status: 400 });
+    return new Response(JSON.stringify({ error: queryParams.error.message }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
-  const transactions = await getTransactionsHistory(
-    user.id,
-    queryParams.data.from,
-    queryParams.data.to
-  );
-  return Response.json(transactions);
+  try {
+    const transactions = await getTransactionsHistory(
+      user.id,
+      new Date(queryParams.data.from),
+      new Date(queryParams.data.to)
+    );
+
+    return new Response(JSON.stringify(transactions), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error fetching transactions history:", error);
+    return new Response(
+      JSON.stringify({ error: "Failed to fetch transaction history" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
 }
 
 export type GetTransactionsHistoryResponseType = Awaited<
@@ -32,32 +47,38 @@ export type GetTransactionsHistoryResponseType = Awaited<
 >;
 
 async function getTransactionsHistory(userId: string, from: Date, to: Date) {
-  const userSettings = await prisma.userSettings.findUnique({
-    where: {
-      userId,
-    },
-  });
-  if (!userSettings) {
-    return Response.json("User settings not found", { status: 404 });
-  }
-
-  const formatter = GetFormatterForCurrency(userSettings.currency);
-
-  const transactions = await prisma.transaction.findMany({
-    where: {
-      userId,
-      date: {
-        gte: from,
-        lte: to,
+  try {
+    const userSettings = await prisma.userSettings.findUnique({
+      where: {
+        userId,
       },
-    },
-    orderBy: {
-      date: "desc",
-    },
-  });
+    });
 
-  return transactions.map((transaction) => ({
-    ...transaction,
-    formattedAmount: formatter.format(transaction.amount),
-  }));
+    if (!userSettings) {
+      throw new Error("User settings not found");
+    }
+
+    const formatter = GetFormatterForCurrency(userSettings.currency);
+
+    const transactions = await prisma.transaction.findMany({
+      where: {
+        userId,
+        date: {
+          gte: from,
+          lte: to,
+        },
+      },
+      orderBy: {
+        date: "desc",
+      },
+    });
+
+    return transactions.map((transaction) => ({
+      ...transaction,
+      formattedAmount: formatter.format(transaction.amount),
+    }));
+  } catch (error) {
+    console.error("Error in getTransactionsHistory:", error);
+    throw new Error("Failed to fetch transactions from the database");
+  }
 }

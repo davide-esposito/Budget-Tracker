@@ -22,14 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { GetTransactionsHistoryResponseType } from "../../../api/transactions-history/route";
-import SkeletonWrapper from "@/components/SkeletonWrapper";
-import DataTableColumnHeader from "@/components/datatable/ColumnHeader";
-import { cn } from "@/lib/utils";
-import { DataTableFacetedFilter } from "@/components/datatable/FacetedFilters";
-import DataTableViewOptions from "@/components/datatable/ColumnToggle";
 import { Button } from "@/components/ui/button";
-import { download, generateCsv, mkConfig } from "export-to-csv";
 import { DownloadIcon, MoreHorizontalIcon, TrashIcon } from "lucide-react";
 import {
   DropdownMenu,
@@ -39,97 +32,90 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import SkeletonWrapper from "@/components/SkeletonWrapper";
+import DataTableColumnHeader from "@/components/datatable/ColumnHeader";
+import { cn } from "@/lib/utils";
+import { DataTableFacetedFilter } from "@/components/datatable/FacetedFilters";
+import DataTableViewOptions from "@/components/datatable/ColumnToggle";
+import { generateCsv, download, mkConfig } from "export-to-csv";
 import DeleteTransactionDialog from "./DeleteTransactionDialog";
+
+export type GetTransactionsHistoryResponseType = {
+  id: string;
+  category: string;
+  categoryIcon: string;
+  amount: number;
+  type: string;
+  date: Date;
+  formattedAmount: string;
+}[];
 
 interface Props {
   from: Date;
   to: Date;
 }
 
-const emptyData: any[] = [];
-
-type TransactionHistoryRow = GetTransactionsHistoryResponseType[0];
-
-// Spaltenkonfiguration für die Tabelle
-const columns: ColumnDef<TransactionHistoryRow>[] = [
+const columns: ColumnDef<GetTransactionsHistoryResponseType[0]>[] = [
   {
     accessorKey: "category",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Category" />
     ),
-    filterFn: (row, id, value) => value.includes(row.getValue(id)),
-    cell: ({ row }) => {
-      return (
-        <div className="flex gap-2 capitalize">
-          {row.original.categoryIcon}
-          <div className="capitalize">{row.original.category}</div>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "description",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Description" />
+    cell: ({ row }) => (
+      <div className="flex gap-2 capitalize">
+        {row.original.categoryIcon} {"  "}
+        {row.original.category}
+      </div>
     ),
-    cell: ({ row }) => {
-      return <div className="capitalize">{row.original.description}</div>;
-    },
-  },
-  {
-    accessorKey: "date",
-    header: "Date",
-    cell: ({ row }) => {
-      const date = new Date(row.original.date);
-      const formattedDate = date.toLocaleDateString("default", {
-        timeZone: "UTC",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      });
-      return <div className="text-muted-foreground">{formattedDate}</div>;
-    },
   },
   {
     accessorKey: "type",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Type" />
     ),
-    filterFn: (row, id, value) => value.includes(row.getValue(id)),
-    cell: ({ row }) => {
-      return (
-        <div
-          className={cn(
-            "capitalize rounded-lg text-center p-2",
-            row.original.type === "income" &&
-              "bg-emerald-400/10 text-emerald-500",
-            row.original.type === "expense" && "bg-rose-400/10 text-rose-500"
-          )}
-        >
-          {row.original.type}
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <div
+        className={cn(
+          "capitalize rounded-lg text-center p-2",
+          row.original.type === "income" &&
+            "bg-emerald-400/10 text-emerald-500",
+          row.original.type === "expense" && "bg-rose-400/10 text-rose-500"
+        )}
+      >
+        {row.original.type}
+      </div>
+    ),
   },
   {
     accessorKey: "amount",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Amount" />
     ),
+    cell: ({ row }) => (
+      <p className="text-md rounded-lg bg-gray-400/5 p-2 text-center font-medium">
+        {row.original.formattedAmount}
+      </p>
+    ),
+  },
+  {
+    accessorKey: "date",
+    header: "Date",
     cell: ({ row }) => {
-      return (
-        <p className="text-md rounded-lg bg-gray-400/5 p-2 text-center font-medium">
-          {row.original.formattedAmount}
-        </p>
+      const formattedDate = new Date(row.original.date).toLocaleDateString(
+        "default",
+        {
+          timeZone: "UTC",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }
       );
+      return <div className="text-muted-foreground">{formattedDate}</div>;
     },
   },
   {
     id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      return <RowActions transaction={row.original} />;
-    },
+    cell: ({ row }) => <RowActions transaction={row.original} />,
   },
 ];
 
@@ -145,21 +131,32 @@ export default function TransactionTable({ from, to }: Props) {
 
   const history = useQuery<GetTransactionsHistoryResponseType>({
     queryKey: ["transactions", "history", from, to],
-    queryFn: () =>
-      fetch(
+    queryFn: async () => {
+      const res = await fetch(
         `/api/transactions-history?from=${DatetoUTCDate(
           from
         )}&to=${DatetoUTCDate(to)}`
-      ).then((res) => res.json()),
+      );
+      if (!res.ok) {
+        throw new Error("Failed to fetch transaction history");
+      }
+      return (await res.json()) as GetTransactionsHistoryResponseType;
+    },
   });
 
-  const handleExportCSV = (data: any[]) => {
-    const csv = generateCsv(csvConfig)(data);
-    download(csvConfig)(csv);
-  };
+  const categoriesOptions = useMemo(() => {
+    const categoriesMap = new Map();
+    history.data?.forEach((transaction) => {
+      categoriesMap.set(transaction.category, {
+        value: transaction.category,
+        label: `${transaction.categoryIcon} ${transaction.category}`,
+      });
+    });
+    return Array.from(categoriesMap.values());
+  }, [history.data]);
 
   const table = useReactTable({
-    data: history.data || emptyData,
+    data: history.data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     state: {
@@ -173,16 +170,16 @@ export default function TransactionTable({ from, to }: Props) {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  const categoriesOptions = useMemo(() => {
-    const categoriesMap = new Map();
-    history.data?.forEach((transaction) => {
-      categoriesMap.set(transaction.category, {
-        value: transaction.category,
-        label: `${transaction.categoryIcon} ${transaction.category}`,
-      });
-    });
-    return Array.from(categoriesMap.values());
-  }, [history.data]);
+  const handleExportCSV = () => {
+    const data = table.getFilteredRowModel().rows.map((row) => ({
+      category: row.original.category,
+      type: row.original.type,
+      amount: row.original.formattedAmount,
+      date: new Date(row.original.date).toLocaleDateString(),
+    }));
+    const csv = generateCsv(csvConfig)(data);
+    download(csvConfig)(csv);
+  };
 
   return (
     <div className="w-full">
@@ -200,35 +197,22 @@ export default function TransactionTable({ from, to }: Props) {
               title="Type"
               column={table.getColumn("type")}
               options={[
-                { label: "Income", value: "income" },
-                { label: "Expense", value: "expense" },
+                { value: "income", label: "Income" },
+                { value: "expense", label: "Expense" },
               ]}
             />
           )}
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant={"outline"}
-            size={"sm"}
-            className="ml-auto h-8 lg:flex"
-            onClick={() => {
-              const data = table.getFilteredRowModel().rows.map((row) => ({
-                category: row.original.category,
-                categoryIcon: row.original.categoryIcon,
-                description: row.original.description,
-                date: row.original.date,
-                type: row.original.type,
-                amount: row.original.amount,
-                formattedAmount: row.original.formattedAmount,
-              }));
-              handleExportCSV(data);
-            }}
-          >
-            <DownloadIcon className="w-4 h-4 mr-2" />
-            Export CSV
-          </Button>
-          <DataTableViewOptions table={table} />
-        </div>
+        <Button
+          variant={"outline"}
+          size={"sm"}
+          className="ml-auto h-8 lg:flex"
+          onClick={handleExportCSV}
+        >
+          <DownloadIcon className="w-4 h-4 mr-2" />
+          Export CSV
+        </Button>
+        <DataTableViewOptions table={table} />
       </div>
       <SkeletonWrapper isLoading={history.isFetching}>
         <div className="rounded-md border">
@@ -276,30 +260,16 @@ export default function TransactionTable({ from, to }: Props) {
             </TableBody>
           </Table>
         </div>
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
       </SkeletonWrapper>
     </div>
   );
 }
 
-function RowActions({ transaction }: { transaction: TransactionHistoryRow }) {
+function RowActions({
+  transaction,
+}: {
+  transaction: GetTransactionsHistoryResponseType[0];
+}) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   return (
@@ -319,10 +289,7 @@ function RowActions({ transaction }: { transaction: TransactionHistoryRow }) {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="flex items-center gap-2"
-            onSelect={() => setShowDeleteDialog(true)}
-          >
+          <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)}>
             <TrashIcon className="w-4 h-4 text-muted-foreground" />
             Delete
           </DropdownMenuItem>
