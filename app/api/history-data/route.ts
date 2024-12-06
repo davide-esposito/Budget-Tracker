@@ -4,10 +4,11 @@ import { currentUser } from "@clerk/nextjs/server";
 import { getDaysInMonth } from "date-fns";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { validateForm } from "@/lib/utils";
 
 const getHistoryDataSchema = z.object({
   timeframe: z.enum(["year", "month"]),
-  month: z.coerce.number().min(0).max(11).default(0),
+  month: z.coerce.number().min(0).max(11).optional(),
   year: z.coerce.number().min(2000).max(3000),
 });
 
@@ -18,24 +19,26 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const timeframe = searchParams.get("timeframe");
-  const year = searchParams.get("year");
-  const month = searchParams.get("month");
 
-  const queryParams = getHistoryDataSchema.safeParse({
-    timeframe,
-    year,
-    month,
-  });
+  const queryParams = {
+    timeframe: searchParams.get("timeframe"),
+    year: searchParams.get("year"),
+    month: searchParams.get("month"),
+  };
 
-  if (!queryParams.success) {
-    return Response.json(queryParams.error.message, { status: 400 });
+  let validatedParams;
+  try {
+    validatedParams = validateForm(getHistoryDataSchema, queryParams);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return Response.json({ error: message }, { status: 400 });
   }
 
-  const data = await getHistoryData(user.id, queryParams.data.timeframe, {
-    year: queryParams.data.year,
-    month: queryParams.data.month,
+  const data = await getHistoryData(user.id, validatedParams.timeframe, {
+    year: validatedParams.year,
+    month: validatedParams.month ?? 0,
   });
+
   return Response.json(data);
 }
 
@@ -75,27 +78,17 @@ async function getYearHistoryData(userId: string, year: number) {
     orderBy: [{ month: "asc" }],
   });
 
-  if (!result || result.length === 0) return [];
-
   const history: HistoryData[] = [];
-
   for (let i = 0; i < 12; i++) {
-    let expense = 0;
-    let income = 0;
-
     const month = result.find((row) => row.month === i);
-    if (month) {
-      expense = month._sum.expense || 0;
-      income = month._sum.income || 0;
-    }
-
     history.push({
       year,
       month: i,
-      expense,
-      income,
+      expense: month?._sum.expense || 0,
+      income: month?._sum.income || 0,
     });
   }
+
   return history;
 }
 
@@ -115,28 +108,19 @@ async function getMonthHistoryData(
     orderBy: [{ day: "asc" }],
   });
 
-  if (!result || result.length === 0) return [];
-
   const history: HistoryData[] = [];
-
   const daysInMonth = getDaysInMonth(new Date(year, month));
+
   for (let i = 1; i <= daysInMonth; i++) {
-    let expense = 0;
-    let income = 0;
-
     const day = result.find((row) => row.day === i);
-    if (day) {
-      expense = day._sum.expense || 0;
-      income = day._sum.income || 0;
-    }
-
     history.push({
       year,
       month,
       day: i,
-      expense,
-      income,
+      expense: day?._sum.expense || 0,
+      income: day?._sum.income || 0,
     });
   }
+
   return history;
 }
