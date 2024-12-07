@@ -1,7 +1,13 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { OverviewQuerySchema } from "../../../../schema/overview";
 import prisma from "@/lib/prisma";
+import { validateForm } from "@/lib/utils";
+import { z } from "zod";
+
+const OverviewQuerySchema = z.object({
+  from: z.coerce.date(),
+  to: z.coerce.date(),
+});
 
 export async function GET(request: Request) {
   const user = await currentUser();
@@ -13,16 +19,21 @@ export async function GET(request: Request) {
   const from = searchParams.get("from");
   const to = searchParams.get("to");
 
-  const queryParams = OverviewQuerySchema.safeParse({ from, to });
-  if (!queryParams.success) {
-    throw new Error(queryParams.error.message);
+  let validatedParams;
+  try {
+    validatedParams = validateForm(OverviewQuerySchema, { from, to });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Invalid query parameters";
+    return Response.json({ error: message }, { status: 400 });
   }
 
   const stats = await getCategorieStats(
     user.id,
-    queryParams.data.from,
-    queryParams.data.to
+    validatedParams.from,
+    validatedParams.to
   );
+
   return Response.json(stats);
 }
 
