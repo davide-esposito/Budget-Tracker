@@ -3,9 +3,11 @@ import { redirect } from "next/navigation";
 import { OverviewQuerySchema } from "../../../schema/overview";
 import prisma from "@/lib/prisma";
 import { GetFormatterForCurrency } from "@/lib/helpers";
+import { validateForm } from "@/lib/utils";
 
 export async function GET(request: Request) {
   const user = await currentUser();
+
   if (!user) {
     return redirect("/sign-in");
   }
@@ -14,31 +16,34 @@ export async function GET(request: Request) {
   const from = searchParams.get("from");
   const to = searchParams.get("to");
 
-  const queryParams = OverviewQuerySchema.safeParse({ from, to });
-  if (!queryParams.success) {
-    return new Response(JSON.stringify({ error: queryParams.error.message }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
   try {
+    const validatedParams = validateForm(OverviewQuerySchema, { from, to });
+
     const transactions = await getTransactionsHistory(
       user.id,
-      new Date(queryParams.data.from),
-      new Date(queryParams.data.to)
+      new Date(validatedParams.from),
+      new Date(validatedParams.to)
     );
 
     return new Response(JSON.stringify(transactions), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error fetching transactions history:", error);
-    return new Response(
-      JSON.stringify({ error: "Failed to fetch transaction history" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+
+    let message = "Unexpected error occurred";
+    let status = 500;
+
+    if (error instanceof Error) {
+      message = error.message;
+      status = error.message.includes("validation") ? 400 : 500;
+    }
+
+    return new Response(JSON.stringify({ error: message }), {
+      status,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
 

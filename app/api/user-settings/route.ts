@@ -10,21 +10,36 @@ export async function GET(request: Request) {
     redirect("/sign-in");
   }
 
-  let userSettings = await prisma.userSettings.findUnique({
-    where: {
-      userId: user.id,
-    },
-  });
-
-  if (!userSettings) {
-    userSettings = await prisma.userSettings.create({
-      data: {
+  try {
+    let userSettings = await prisma.userSettings.findUnique({
+      where: {
         userId: user.id,
-        currency: "USD",
       },
     });
-  }
 
-  revalidatePath("/");
-  return Response.json(userSettings);
+    if (!userSettings) {
+      userSettings = await prisma.userSettings.create({
+        data: {
+          userId: user.id,
+          currency: "USD",
+        },
+      });
+    }
+
+    revalidatePath("/");
+
+    return new Response(JSON.stringify(userSettings), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error fetching or creating user settings:", error);
+    return new Response(
+      JSON.stringify({ error: "Failed to fetch or create user settings" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 }

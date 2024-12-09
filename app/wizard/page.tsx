@@ -14,9 +14,10 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import CurrencyComboBox from "@/components/CurrencyComboBox";
 
-export default async function page() {
+export default async function Page() {
   const user = await currentUser();
   console.log(user);
+
   if (!user) {
     redirect("/sign-in");
   }
@@ -34,7 +35,9 @@ export default async function page() {
           You can always change this later
         </h3>
       </div>
+
       <Separator />
+
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Currency</CardTitle>
@@ -46,10 +49,13 @@ export default async function page() {
           <CurrencyComboBox />
         </CardContent>
       </Card>
+
       <Separator />
+
       <Button className="w-full" asChild>
         <Link href={"/"}>I'm done! Take me to the dashboard</Link>
       </Button>
+
       <div className="mt-8">
         <Logo />
       </div>
