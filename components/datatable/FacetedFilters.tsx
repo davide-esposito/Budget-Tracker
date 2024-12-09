@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Column } from "@tanstack/react-table";
 import { Check, PlusCircle } from "lucide-react";
 
@@ -21,14 +21,16 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 
+interface Option {
+  label: string;
+  value: string;
+  icon?: React.ComponentType<{ className?: string }>;
+}
+
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
   title?: string;
-  options: {
-    label: string;
-    value: string;
-    icon?: React.ComponentType<{ className?: string }>;
-  }[];
+  options: Option[];
 }
 
 export function DataTableFacetedFilter<TData, TValue>({
@@ -36,25 +38,39 @@ export function DataTableFacetedFilter<TData, TValue>({
   title,
   options,
 }: DataTableFacetedFilterProps<TData, TValue>) {
-  const facets = column?.getFacetedUniqueValues() ?? new Map();
-  const selectedValues = new Set(column?.getFilterValue() as string[]);
+  if (!column) return null;
 
-  const handleSelect = (value: string) => {
-    if (selectedValues.has(value)) {
-      selectedValues.delete(value);
-    } else {
-      selectedValues.add(value);
-    }
-    const filterValues = Array.from(selectedValues);
-    column?.setFilterValue(filterValues.length ? filterValues : undefined);
-  };
+  const facets = column.getFacetedUniqueValues() ?? new Map();
+  const selectedValues = new Set(column.getFilterValue() as string[]);
 
-  const clearFilters = () => column?.setFilterValue(undefined);
+  const handleSelect = useCallback(
+    (value: string) => {
+      if (selectedValues.has(value)) {
+        selectedValues.delete(value);
+      } else {
+        selectedValues.add(value);
+      }
+      const filterValues = Array.from(selectedValues);
+      column.setFilterValue(filterValues.length ? filterValues : undefined);
+    },
+    [column, selectedValues]
+  );
+
+  const clearFilters = useCallback(() => {
+    selectedValues.clear();
+    column.setFilterValue(undefined);
+  }, [column, selectedValues]);
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 border-dashed"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
           <PlusCircle />
           {title}
           {selectedValues.size > 0 && (
@@ -94,7 +110,10 @@ export function DataTableFacetedFilter<TData, TValue>({
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0" align="start">
         <Command>
-          <CommandInput placeholder={title || "Search"} />
+          <CommandInput
+            placeholder={title || "Search"}
+            aria-label={title || "Search"}
+          />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
@@ -104,6 +123,8 @@ export function DataTableFacetedFilter<TData, TValue>({
                   <CommandItem
                     key={option.value}
                     onSelect={() => handleSelect(option.value)}
+                    aria-checked={isSelected}
+                    role="menuitemcheckbox"
                   >
                     <div
                       className={cn(

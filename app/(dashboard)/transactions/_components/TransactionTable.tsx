@@ -9,6 +9,8 @@ import {
   SortingState,
   flexRender,
   getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
@@ -61,6 +63,10 @@ const columns: ColumnDef<GetTransactionsHistoryResponseType[0]>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Category" />
     ),
+    filterFn: (row, id, filterValue) => {
+      const value = row.getValue(id);
+      return filterValue.includes(value);
+    },
     cell: ({ row }) => (
       <div className="flex gap-2 capitalize">
         {row.original.categoryIcon} {"  "}
@@ -73,6 +79,10 @@ const columns: ColumnDef<GetTransactionsHistoryResponseType[0]>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Type" />
     ),
+    filterFn: (row, id, filterValue) => {
+      const value = row.getValue(id);
+      return filterValue.includes(value);
+    },
     cell: ({ row }) => (
       <div
         className={cn(
@@ -173,6 +183,8 @@ export default function TransactionTable({ from, to }: Props) {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
   const handleExportCSV = () => {
