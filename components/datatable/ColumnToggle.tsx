@@ -37,7 +37,7 @@ const DataTableViewOptions: React.FC<DataTableViewOptionsProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className="hidden h-8 ml-auto lg:flex"
+          className="hidden h-8 ml-auto lg:flex bg-card"
         >
           <MixerHorizontalIcon className="w-4 h-4 mr-2" />
           View

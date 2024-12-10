@@ -67,7 +67,7 @@ export function DataTableFacetedFilter<TData, TValue>({
         <Button
           variant="outline"
           size="sm"
-          className="h-8 border-dashed"
+          className="h-8 border-dashed bg-card"
           aria-haspopup="true"
           aria-expanded="false"
         >

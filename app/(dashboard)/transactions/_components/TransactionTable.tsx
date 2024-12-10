@@ -223,7 +223,7 @@ export default function TransactionTable({ from, to }: Props) {
         <Button
           variant={"outline"}
           size={"sm"}
-          className="ml-auto h-8 lg:flex"
+          className="ml-auto h-8 lg:flex bg-card"
           onClick={handleExportCSV}
         >
           <DownloadIcon className="w-4 h-4 mr-2" />
@@ -232,7 +232,7 @@ export default function TransactionTable({ from, to }: Props) {
         <DataTableViewOptions table={table} />
       </div>
       <SkeletonWrapper isLoading={history.isFetching}>
-        <div className="rounded-md border">
+        <div className="rounded-md border bg-card">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

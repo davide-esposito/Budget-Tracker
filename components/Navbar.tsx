@@ -34,7 +34,12 @@ function MobileNavbar() {
       <nav className="container flex items-center justify-between px-8">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
-            <Button variant={"ghost"} size={"icon"}>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Open menu"
+              aria-expanded={isOpen}
+            >
               <Menu />
             </Button>
           </SheetTrigger>
@@ -110,6 +115,7 @@ function NavbarLink({
           "w-full justify-start text-lg text-muted-foreground hover:text-foreground",
           isActive && "text-foreground"
         )}
+        aria-current={isActive ? "page" : undefined}
         onClick={() => {
           if (clickCallback) clickCallback();
         }}
@@ -117,7 +123,10 @@ function NavbarLink({
         {label}
       </Link>
       {isActive && (
-        <div className="absolute -bottom-[2px] left-1/2 hidden h-[2px] w-[80%] -translate-x-1/2 rounded-xl bg-foreground md:block" />
+        <div
+          className="absolute -bottom-[2px] left-1/2 hidden h-[2px] w-[80%] -translate-x-1/2 rounded-xl bg-foreground md:block"
+          aria-hidden="true"
+        />
       )}
     </div>
   );

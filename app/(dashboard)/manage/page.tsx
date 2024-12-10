@@ -94,7 +94,7 @@ function CategoryList({ type }: { type: TransactionType }) {
               type={type}
               successCallback={() => categoriesQuery.refetch()}
               trigger={
-                <Button className="gap-2 text-sm">
+                <Button variant={"outline"} className="gap-2 text-sm">
                   <PlusSquare className="h-4 w-4" />
                   Create category
                 </Button>
