@@ -2,7 +2,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { OverviewQuerySchema } from "../../../schema/overview";
 import prisma from "@/lib/prisma";
-import { GetFormatterForCurrency } from "@/lib/helpers";
+import { getFormatterForCurrency } from "@/lib/helpers";
 import { validateForm } from "@/lib/utils";
 
 export async function GET(request: Request) {
@@ -63,7 +63,7 @@ async function getTransactionsHistory(userId: string, from: Date, to: Date) {
       throw new Error("User settings not found");
     }
 
-    const formatter = GetFormatterForCurrency(userSettings.currency);
+    const formatter = getFormatterForCurrency(userSettings.currency);
 
     const transactions = await prisma.transaction.findMany({
       where: {

@@ -4,7 +4,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Period, Timeframe } from "@/lib/types";
 import { UserSettings } from "@prisma/client";
-import { GetFormatterForCurrency } from "@/lib/helpers";
+import { getFormatterForCurrency } from "@/lib/helpers";
 import SkeletonWrapper from "@/components/SkeletonWrapper";
 import HistoryPeriodSelector from "./HistoryPeriodSelector";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +33,7 @@ export default function History({
   });
 
   const formatter = useMemo(
-    () => GetFormatterForCurrency(userSettings.currency),
+    () => getFormatterForCurrency(userSettings.currency),
     [userSettings.currency]
   );
 

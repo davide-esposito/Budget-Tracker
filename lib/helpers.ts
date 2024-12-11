@@ -1,6 +1,10 @@
 import { currencies } from "./currencies";
 
-export function DatetoUTCDate(date: Date) {
+/**
+ * @param date - The local Date object to convert.
+ * @returns A new Date object in UTC.
+ */
+export function dateToUTCDate(date: Date): Date {
   return new Date(
     Date.UTC(
       date.getFullYear(),
@@ -14,10 +18,19 @@ export function DatetoUTCDate(date: Date) {
   );
 }
 
-export function GetFormatterForCurrency(currency: string) {
-  const locale = currencies.find((c) => c.value === currency)?.locale;
-  return new Intl.NumberFormat(locale, {
+/**
+ * @param currency - The currency code (e.g., "USD", "EUR").
+ * @returns An Intl.NumberFormat instance configured for the currency, using a fallback if necessary.
+ */
+export function getFormatterForCurrency(currency: string): Intl.NumberFormat {
+  const currencyData = currencies.find((c) => c.value === currency) || {
+    value: "USD",
+    label: "$ Dollar",
+    locale: "en-US",
+  };
+
+  return new Intl.NumberFormat(currencyData.locale, {
     style: "currency",
-    currency,
+    currency: currencyData.value,
   });
 }

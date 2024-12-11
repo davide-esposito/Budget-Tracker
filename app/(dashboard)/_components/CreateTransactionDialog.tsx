@@ -40,7 +40,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreateTransaction } from "../_actions/transactions";
 import { toast } from "sonner";
-import { DatetoUTCDate } from "@/lib/helpers";
+import { dateToUTCDate } from "@/lib/helpers";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -87,7 +87,7 @@ export default function CreateTransactionDialog({ trigger, type }: Props) {
   const onSubmit = useCallback(
     (values: CreateTransactionSchemaType) => {
       toast.loading("Creating transaction...", { id: "create-transaction" });
-      mutate({ ...values, date: DatetoUTCDate(values.date) });
+      mutate({ ...values, date: dateToUTCDate(values.date) });
     },
     [mutate]
   );

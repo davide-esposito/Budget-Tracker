@@ -3,7 +3,7 @@
 import React, { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { UserSettings } from "@prisma/client";
-import { DatetoUTCDate, GetFormatterForCurrency } from "@/lib/helpers";
+import { dateToUTCDate, getFormatterForCurrency } from "@/lib/helpers";
 import { TransactionType } from "@/lib/types";
 import { GetCategorieStatsResponseType } from "../../api/stats/categories/route";
 import SkeletonWrapper from "@/components/SkeletonWrapper";
@@ -22,7 +22,7 @@ export default function CategorieStats({ userSettings, from, to }: Props) {
     queryKey: ["overview", "stats", "categories", from, to],
     queryFn: () =>
       fetch(
-        `/api/stats/categories?from=${DatetoUTCDate(from)}&to=${DatetoUTCDate(
+        `/api/stats/categories?from=${dateToUTCDate(from)}&to=${dateToUTCDate(
           to
         )}`
       ).then((res) => {
@@ -33,7 +33,7 @@ export default function CategorieStats({ userSettings, from, to }: Props) {
   });
 
   const formatter = useMemo(
-    () => GetFormatterForCurrency(userSettings.currency),
+    () => getFormatterForCurrency(userSettings.currency),
     [userSettings.currency]
   );
 

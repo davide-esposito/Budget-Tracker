@@ -4,7 +4,7 @@ import { UserSettings } from "@prisma/client";
 import React, { ReactNode, useCallback, useMemo } from "react";
 import { GetBalanceStatsResponseType } from "../../api/stats/balance/route";
 import { useQuery } from "@tanstack/react-query";
-import { DatetoUTCDate, GetFormatterForCurrency } from "@/lib/helpers";
+import { dateToUTCDate, getFormatterForCurrency } from "@/lib/helpers";
 import SkeletonWrapper from "@/components/SkeletonWrapper";
 import { TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -21,7 +21,7 @@ export default function StatsCards({ from, to, userSettings }: Props) {
     queryKey: ["overview", "stats", from, to],
     queryFn: () =>
       fetch(
-        `/api/stats/balance?from=${DatetoUTCDate(from)}&to=${DatetoUTCDate(to)}`
+        `/api/stats/balance?from=${dateToUTCDate(from)}&to=${dateToUTCDate(to)}`
       ).then((res) => {
         if (!res.ok) {
           throw new Error("Failed to fetch stats data");
@@ -32,7 +32,7 @@ export default function StatsCards({ from, to, userSettings }: Props) {
   });
 
   const formatter = useMemo(
-    () => GetFormatterForCurrency(userSettings.currency),
+    () => getFormatterForCurrency(userSettings.currency),
     [userSettings.currency]
   );
 

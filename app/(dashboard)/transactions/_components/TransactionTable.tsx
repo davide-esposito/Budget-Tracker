@@ -1,6 +1,6 @@
 "use client";
 
-import { DatetoUTCDate } from "@/lib/helpers";
+import { dateToUTCDate } from "@/lib/helpers";
 import { useQuery } from "@tanstack/react-query";
 import React, { useMemo, useState } from "react";
 import {
@@ -143,9 +143,9 @@ export default function TransactionTable({ from, to }: Props) {
     queryKey: ["transactions", "history", from, to],
     queryFn: async () => {
       const res = await fetch(
-        `/api/transactions-history?from=${DatetoUTCDate(
+        `/api/transactions-history?from=${dateToUTCDate(
           from
-        )}&to=${DatetoUTCDate(to)}`
+        )}&to=${dateToUTCDate(to)}`
       );
       if (!res.ok) {
         throw new Error("Failed to fetch transaction history");
