@@ -7,52 +7,52 @@ datasource db {
   url      = "file:.dev.db"
 }
 
-model UserSettings{
-  userId String @id
+model UserSettings {
+  userId   String @id
   currency String
 }
 
-model Category{
+model Category {
   createdAt DateTime @default(now())
-  name String
-  icon String
-  type String @default("income")
-  userId String
+  name      String
+  icon      String
+  type      String @default("income")
+  userId    String
 
   @@unique([name, userId, type])
 }
 
-model Transaction{
-  id String @id @default(uuid())
-  createdAt DateTime @default(now())
-  updateAt DateTime @default(now())
+model Transaction {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updateAt    DateTime @default(now()) @updatedAt
 
-  amount Float
+  amount      Float
   description String
-  date DateTime
-  type String @default("income")
-  userId String
+  date        DateTime
+  type        String   @default("income")
+  userId      String
 
-  category String
+  category    String
   categoryIcon String
 }
 
-model MonthHistory{
-  userId String
-  day Int
-  month Int
-  year Int
-  income Float
+model MonthHistory {
+  userId  String
+  day     Int
+  month   Int
+  year    Int
+  income  Float
   expense Float
 
   @@id([userId, day, month, year])
 }
 
-model YearHistory{
-  userId String
-  month Int
-  year Int
-  income Float
+model YearHistory {
+  userId  String
+  month   Int
+  year    Int
+  income  Float
   expense Float
 
   @@id([userId, month, year])

@@ -23,10 +23,10 @@ export function dateToUTCDate(date: Date): Date {
  * @returns An Intl.NumberFormat instance configured for the currency, using a fallback if necessary.
  */
 export function getFormatterForCurrency(currency: string): Intl.NumberFormat {
-  const currencyData = currencies.find((c) => c.value === currency) || {
+  const currencyData = currencies.find((c) => c.value === currency) ?? {
     value: "USD",
-    label: "$ Dollar",
     locale: "en-US",
+    label: "$ Dollar",
   };
 
   return new Intl.NumberFormat(currencyData.locale, {
