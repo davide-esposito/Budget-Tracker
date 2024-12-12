@@ -2,11 +2,15 @@ import { currencies } from "@/lib/currencies";
 import { z } from "zod";
 
 export const UpdateUserCurrencySchema = z.object({
-  currency: z.custom((value) => {
-    const found = currencies.some((currency) => currency.value === value);
-    if (!found) {
-      throw new Error(`Invalid currency: ${value}`);
-    }
-    return value;
-  }),
+  currency: z
+    .string({
+      required_error: "Currency is required.",
+      invalid_type_error: "Currency must be a string.",
+    })
+    .refine(
+      (value) => currencies.some((currency) => currency.value === value),
+      {
+        message: "Invalid currency. Please select a valid option.",
+      }
+    ),
 });
