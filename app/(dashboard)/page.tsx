@@ -40,7 +40,7 @@ export default async function page() {
               trigger={
                 <Button
                   variant={"outline"}
-                  className="border-emerald-500 bg-emerald-950 text-white hover:bg-emerald-700 hover:text-white"
+                  className="border-emerald-500 bg-emerald-800 text-white hover:bg-emerald-700 hover:text-white"
                   aria-label="Create a new income transaction"
                 >
                   New income 🤑
@@ -52,7 +52,7 @@ export default async function page() {
               trigger={
                 <Button
                   variant={"outline"}
-                  className="border-rose-500 bg-rose-950 text-white hover:bg-rose-700 hover:text-white"
+                  className="border-rose-500 bg-rose-800 text-white hover:bg-rose-700 hover:text-white"
                   aria-label="Create a new expense transaction"
                 >
                   New expense 🥲

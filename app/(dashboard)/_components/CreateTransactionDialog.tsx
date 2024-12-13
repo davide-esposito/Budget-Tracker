@@ -169,7 +169,7 @@ export default function CreateTransactionDialog({ trigger, type }: Props) {
                 id="date"
                 variant="outline"
                 aria-label="Select transaction date"
-                className={cn("w-[200px] pl-3 text-left font-normal")}
+                className={cn("w-full pl-3 text-left font-normal")}
               >
                 {field.value ? format(field.value, "PPP") : "Pick a date"}
                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
@@ -193,7 +193,7 @@ export default function CreateTransactionDialog({ trigger, type }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen} aria-labelledby="dialog-title">
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-lg w-full">
         <DialogHeader>
           <DialogTitle>
             Create a new
@@ -212,13 +212,13 @@ export default function CreateTransactionDialog({ trigger, type }: Props) {
           <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
             {renderDescriptionField()}
             {renderAmountField()}
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-4">
               {renderCategoryPicker()}
               {renderDatePicker()}
             </div>
           </form>
         </Form>
-        <DialogFooter>
+        <DialogFooter className="flex flex-col gap-2">
           <DialogClose asChild>
             <Button
               type="button"

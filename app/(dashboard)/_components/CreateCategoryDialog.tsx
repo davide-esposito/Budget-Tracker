@@ -127,59 +127,64 @@ export default function CreateCategoryDialog({
     />
   );
 
-  const renderIconField = () => (
-    <FormField
-      control={form.control}
-      name="icon"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel htmlFor="icon">Icon</FormLabel>
-          <FormControl>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  id="icon"
-                  aria-label="Select category icon"
-                  variant="outline"
-                  className="h-[100px] w-full"
-                >
-                  {form.watch("icon") ? (
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="text-5xl" role="img">
-                        {field.value}
-                      </span>
-                      <p className="text-xs text-muted-foreground">
-                        Click to change
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-2">
-                      <CircleOff className="h-[48px] w-[48px]" />
-                      <p className="text-xs text-muted-foreground">
-                        Click to select
-                      </p>
-                    </div>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full">
-                <Picker
-                  data={data}
-                  theme={theme.resolvedTheme}
-                  onEmojiSelect={(emoji: { native: string }) =>
-                    field.onChange(emoji.native)
-                  }
-                />
-              </PopoverContent>
-            </Popover>
-          </FormControl>
-          <FormDescription>
-            Choose an icon to visually represent your category.
-          </FormDescription>
-        </FormItem>
-      )}
-    />
-  );
+  const renderIconField = () => {
+    const [popoverOpen, setPopoverOpen] = useState(false);
+
+    return (
+      <FormField
+        control={form.control}
+        name="icon"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel htmlFor="icon">Icon</FormLabel>
+            <FormControl>
+              <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="icon"
+                    aria-label="Select category icon"
+                    variant="outline"
+                    className="h-[100px] w-full"
+                  >
+                    {form.watch("icon") ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-5xl" role="img">
+                          {field.value}
+                        </span>
+                        <p className="text-xs text-muted-foreground">
+                          Click to change
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <CircleOff className="h-[48px] w-[48px]" />
+                        <p className="text-xs text-muted-foreground">
+                          Click to select
+                        </p>
+                      </div>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full">
+                  <Picker
+                    data={data}
+                    theme={theme.resolvedTheme}
+                    onEmojiSelect={(emoji: { native: string }) => {
+                      field.onChange(emoji.native);
+                      setPopoverOpen(false);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </FormControl>
+            <FormDescription>
+              Choose an icon to visually represent your category.
+            </FormDescription>
+          </FormItem>
+        )}
+      />
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

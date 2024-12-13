@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Budget Tracker
 
-## Getting Started
+## ✨ Overview
 
-First, run the development server:
+Budget Tracker is a user-friendly application designed to help users manage their finances efficiently. It supports features such as tracking income and expenses, managing categories, and viewing financial summaries over time. Built with modern web technologies, the app is optimized for seamless performance and scalability.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **User Authentication**: Secure sign-in and sign-up with Clerk.
+- **Income and Expense Tracking**: Add, view, and manage transactions categorized by type.
+- **Category Management**: Create and delete custom categories for better organization.
+- **Date Range Filtering**: Filter transactions by specific timeframes.
+- **Responsive Design**: Optimized for desktop and mobile devices.
+- **Dark Mode Support**: Toggle between light and dark themes effortlessly.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🔧 Technologies Used
 
-To learn more about Next.js, take a look at the following resources:
+- **Next.js**: Framework for server-rendered React applications.
+- **Prisma**: ORM for seamless database management.
+- **SQLite**: Lightweight database for development.
+- **Zod**: Schema validation for form and API data.
+- **Clerk**: Authentication and user management.
+- **Tailwind CSS**: Utility-first CSS framework for styling.
+- **React Query**: State management for server data.
+- **date-fns**: Utility library for date manipulation.
+- **shadcn/ui**: Pre-built accessible UI components.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔎 Usage
 
-## Deploy on Vercel
+1. **Sign Up/Sign In:**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   - Use the Clerk authentication system to create an account or log in.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. **Add Transactions:**
+
+   - Add income or expense transactions with categories, amounts, and descriptions.
+
+3. **Manage Categories:**
+
+   - Create and delete categories for better transaction organization.
+
+4. **Filter by Date Range:**
+
+   - View transactions for specific periods (e.g., month, year).
+
+5. **Dark Mode:**
+   - Toggle between light and dark themes based on your preference.
+
+---
+
+## ⚖️ License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## 💡 Contribution
+
+Contributions are welcome! Feel free to fork the repository and submit pull requests for new features or bug fixes.
+
+---
+
+## 🛠️ Support
+
+For issues or feature requests, please open an issue in the [GitHub repository](https://github.com/davide-esposito/budget-tracker/issues).
