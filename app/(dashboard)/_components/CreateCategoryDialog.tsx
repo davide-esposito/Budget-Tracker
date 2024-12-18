@@ -104,7 +104,7 @@ export default function CreateCategoryDialog({
     [mutate]
   );
 
-  const renderNameField = () => (
+  const RenderNameField = () => (
     <FormField
       control={form.control}
       name="name"
@@ -127,7 +127,7 @@ export default function CreateCategoryDialog({
     />
   );
 
-  const renderIconField = () => {
+  const RenderIconField = () => {
     const [popoverOpen, setPopoverOpen] = useState(false);
 
     return (
@@ -220,8 +220,8 @@ export default function CreateCategoryDialog({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {renderNameField()}
-            {renderIconField()}
+            {RenderNameField()}
+            {RenderIconField()}
           </form>
         </Form>
         <DialogFooter>
