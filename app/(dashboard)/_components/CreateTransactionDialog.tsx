@@ -139,7 +139,7 @@ export default function CreateTransactionDialog({ trigger, type }: Props) {
     <FormField
       control={form.control}
       name="category"
-      render={({ field }) => (
+      render={({}) => (
         <FormItem>
           <FormLabel htmlFor="category">Category</FormLabel>
           <FormControl>

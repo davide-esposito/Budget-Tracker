@@ -59,7 +59,7 @@ export default function DeleteCategoryDialog({ category, trigger }: Props) {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Are you sure you want to delete the category "{category.name}"?
+            Are you sure you want to delete the category, {category.name}?
           </AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. Deleting this category will
