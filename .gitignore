@@ -14,7 +14,7 @@
 # Next.js specific
 /.next/
 /out/
-/.versel
+/.vercel
 
 # Build outputs
 /build
