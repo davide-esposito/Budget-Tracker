@@ -5,11 +5,7 @@ const prismaClientSingleton = (): PrismaClient => {
 };
 
 declare global {
-  namespace NodeJS {
-    interface Global {
-      prismaGlobal?: PrismaClient;
-    }
-  }
+  var prismaGlobal: PrismaClient | undefined;
 }
 
 const prisma = global.prismaGlobal ?? prismaClientSingleton();

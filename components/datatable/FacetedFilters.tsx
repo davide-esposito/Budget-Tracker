@@ -40,18 +40,15 @@ export function DataTableFacetedFilter<TData, TValue>({
   title,
   options,
 }: DataTableFacetedFilterProps<TData, TValue>) {
-  if (!column) {
-    return null;
-  }
-
-  const facets = column.getFacetedUniqueValues() ?? new Map();
+  const facets = column?.getFacetedUniqueValues() ?? new Map();
   const selectedValues = useMemo(
-    () => new Set(column.getFilterValue() as string[]),
+    () => new Set((column?.getFilterValue() as string[]) ?? []),
     [column]
   );
 
   const handleSelect = useCallback(
     (value: string) => {
+      if (!column) return;
       if (selectedValues.has(value)) {
         selectedValues.delete(value);
       } else {
@@ -64,9 +61,14 @@ export function DataTableFacetedFilter<TData, TValue>({
   );
 
   const clearFilters = useCallback(() => {
+    if (!column) return;
     selectedValues.clear();
     column.setFilterValue(undefined);
   }, [column, selectedValues]);
+
+  if (!column) {
+    return null;
+  }
 
   return (
     <Popover>
