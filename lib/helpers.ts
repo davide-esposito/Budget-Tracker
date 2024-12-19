@@ -22,17 +22,15 @@ export function dateToUTCDate(date: Date): Date {
  * @param currency - The currency code (e.g., "USD", "EUR").
  * @returns A function that formats a number as currency.
  */
-export function getFormatterForCurrency(currency: string): (value: number) => string {
+export function getFormatterForCurrency(currency: string): Intl.NumberFormat {
   const currencyData = currencies.find((c) => c.value === currency) ?? {
     value: "USD",
     locale: "en-US",
     label: "$ Dollar",
   };
 
-  const formatter = new Intl.NumberFormat(currencyData.locale, {
+  return new Intl.NumberFormat(currencyData.locale, {
     style: "currency",
     currency: currencyData.value,
   });
-
-  return (value: number) => formatter.format(value);
 }
