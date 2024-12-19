@@ -1,4 +1,6 @@
-import React, { useCallback } from "react";
+"use client";
+
+import React, { useMemo, useCallback } from "react";
 import { Column } from "@tanstack/react-table";
 import { Check, PlusCircle } from "lucide-react";
 
@@ -38,10 +40,15 @@ export function DataTableFacetedFilter<TData, TValue>({
   title,
   options,
 }: DataTableFacetedFilterProps<TData, TValue>) {
-  if (!column) return null;
+  if (!column) {
+    return null;
+  }
 
   const facets = column.getFacetedUniqueValues() ?? new Map();
-  const selectedValues = new Set(column.getFilterValue() as string[]);
+  const selectedValues = useMemo(
+    () => new Set(column.getFilterValue() as string[]),
+    [column]
+  );
 
   const handleSelect = useCallback(
     (value: string) => {

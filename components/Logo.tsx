@@ -1,9 +1,10 @@
 import { PiggyBank } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
 function Logo() {
   return (
-    <a
+    <Link
       href="/"
       className="flex items-center gap-2"
       aria-label="Go to home page"
@@ -15,13 +16,13 @@ function Logo() {
       <p className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-3xl font-bold leading-tight tracking-tighter text-transparent">
         BudgetTracker
       </p>
-    </a>
+    </Link>
   );
 }
 
 function LogoMobile() {
   return (
-    <a
+    <Link
       href="/"
       className="flex items-center gap-2"
       aria-label="Go to home page"
@@ -29,7 +30,7 @@ function LogoMobile() {
       <p className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-3xl font-bold leading-tight tracking-tighter text-transparent">
         BudgetTracker
       </p>
-    </a>
+    </Link>
   );
 }
 

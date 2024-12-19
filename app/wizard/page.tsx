@@ -53,7 +53,7 @@ export default async function Page() {
       <Separator />
 
       <Button className="w-full" asChild>
-        <Link href={"/"}>I'm done! Take me to the dashboard</Link>
+        <Link href={"/"}>I&apos;m done! Take me to the dashboard</Link>
       </Button>
 
       <div className="mt-8">

@@ -13,13 +13,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MixerHorizontalIcon } from "@radix-ui/react-icons";
 
-interface DataTableViewOptionsProps {
-  table: Table<any>;
+interface DataTableViewOptionsProps<TData> {
+  table: Table<TData>;
 }
 
-const DataTableViewOptions: React.FC<DataTableViewOptionsProps> = ({
+const DataTableViewOptions = <TData,>({
   table,
-}) => {
+}: DataTableViewOptionsProps<TData>) => {
   const columns = useMemo(
     () =>
       table
