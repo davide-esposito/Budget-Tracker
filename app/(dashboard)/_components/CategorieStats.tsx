@@ -73,7 +73,7 @@ export default function CategorieStats({ userSettings, from, to }: Props) {
     return (
       <div className="flex h-60 w-full flex-col items-center justify-center">
         No data for the selected period
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground text-center">
           Try selecting a different period or try adding new{" "}
           {type === "income" ? "incomes" : "expenses"}.
         </p>
