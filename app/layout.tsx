@@ -5,18 +5,20 @@ import { Toaster } from "sonner";
 
 export const metadata = {
   title: "Budget Tracker - Manage Your Finances",
-  description: "A simple and efficient app to help you track your budget and expenses effortlessly.",
+  description:
+    "A simple and efficient app to help you track your budget and expenses effortlessly.",
   openGraph: {
     title: "Budget Tracker - Your Finance Manager",
-    description: "Take control of your finances with our intuitive budget tracker app.",
+    description:
+      "Take control of your finances with our intuitive budget tracker app.",
     url: "https://budget-tracker-wheat-phi.vercel.app/",
     siteName: "Budget Tracker",
     images: [
       {
-        url: "https://budget-tracker-wheat-phi.vercel.app/favicon.ico",
-        width: 256,
-        height: 256,
-        alt: "Budget Tracker favicon",
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Budget Tracker piggy bank icon",
       },
     ],
     locale: "en_US",
@@ -42,7 +44,10 @@ export default function RootLayout({
         <head>
           {/* Basic Metadata */}
           <meta charSet="UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+          />
           <meta name="description" content={metadata.description} />
           <title>{metadata.title}</title>
 
@@ -51,7 +56,10 @@ export default function RootLayout({
 
           {/* Open Graph Metadata */}
           <meta property="og:title" content={metadata.openGraph.title} />
-          <meta property="og:description" content={metadata.openGraph.description} />
+          <meta
+            property="og:description"
+            content={metadata.openGraph.description}
+          />
           <meta property="og:url" content={metadata.openGraph.url} />
           <meta property="og:site_name" content={metadata.openGraph.siteName} />
           <meta property="og:type" content={metadata.openGraph.type} />
