@@ -64,10 +64,18 @@ export default function RootLayout({
           <meta property="og:site_name" content={metadata.openGraph.siteName} />
           <meta property="og:type" content={metadata.openGraph.type} />
           {metadata.openGraph.images.map((image, index) => (
-            <meta key={index} property="og:image" content={image.url} />
+            <meta
+              key={`og-image-${index}`}
+              property="og:image"
+              content={image.url}
+            />
           ))}
           {metadata.openGraph.images.map((image, index) => (
-            <meta key={index} property="og:image:alt" content={image.alt} />
+            <meta
+              key={`og-alt-${index}`}
+              property="og:image:alt"
+              content={image.alt}
+            />
           ))}
         </head>
         <body className="antialiased">
