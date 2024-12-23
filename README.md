@@ -1,62 +1,64 @@
 # Budget Tracker
 
-## ✨ Overview
-
-Budget Tracker is a user-friendly application designed to help users manage their finances efficiently. It supports features such as tracking income and expenses, managing categories, and viewing financial summaries over time. Built with modern web technologies, the app is optimized for seamless performance and scalability.
+✨ **Overview**  
+Budget Tracker is a user-friendly application designed to help users efficiently manage their finances. It features income and expense tracking, category management, and financial summaries over time. Built with modern web technologies, the app is optimized for seamless performance and scalability.
 
 ---
 
 ## 🚀 Features
 
-- **User Authentication**: Secure sign-in and sign-up with Clerk.
-- **Income and Expense Tracking**: Add, view, and manage transactions categorized by type.
-- **Category Management**: Create and delete custom categories for better organization.
-- **Date Range Filtering**: Filter transactions by specific timeframes.
-- **Responsive Design**: Optimized for desktop and mobile devices.
-- **Dark Mode Support**: Toggle between light and dark themes effortlessly.
+- **User Authentication:** Secure sign-in and sign-up with Clerk.
+- **Income and Expense Tracking:** Add, view, and manage transactions categorized by type.
+- **Category Management:** Create and delete custom categories for better organization.
+- **Date Range Filtering:** View transactions for specific periods (e.g., month, year).
+- **Responsive Design:** Optimized for both desktop and mobile devices.
+- **Dark Mode:** Easily toggle between light and dark themes.
 
 ---
 
 ## 🔧 Technologies Used
 
-- **Next.js**: Framework for server-rendered React applications.
-- **Prisma**: ORM for seamless database management.
-- **SQLite**: Lightweight database for development.
-- **Zod**: Schema validation for form and API data.
-- **Clerk**: Authentication and user management.
-- **Tailwind CSS**: Utility-first CSS framework for styling.
-- **React Query**: State management for server data.
-- **date-fns**: Utility library for date manipulation.
-- **shadcn/ui**: Pre-built accessible UI components.
+- **Next.js:** Framework for server-rendered React applications and API integration.
+- **TypeScript:** For static type-checking and more robust code.
+- **Supabase:** PostgreSQL database with real-time and API support.
+- **Prisma:** ORM for seamless database management.
+- **Zod:** Schema validation for form and API data.
+- **Clerk:** Authentication and user management.
+- **Tailwind CSS:** Utility-first CSS framework for styling.
+- **React Query:** State management for server data.
+- **date-fns:** Utility library for date manipulation.
+- **shadcn/ui:** Pre-built accessible UI components.
 
 ---
 
 ## 🔎 Usage
 
-1. **Sign Up/Sign In:**
+1. **Sign Up/Sign In:**  
+   Create an account or log in using the Clerk authentication system.
 
-   - Use the Clerk authentication system to create an account or log in.
+2. **Add Transactions:**  
+   Add income or expense transactions with categories, amounts, and descriptions.
 
-2. **Add Transactions:**
+3. **Manage Categories:**  
+   Create and delete categories to better organize your transactions.
 
-   - Add income or expense transactions with categories, amounts, and descriptions.
+4. **Filter by Date Range:**  
+   View transactions for specific time periods.
 
-3. **Manage Categories:**
+5. **Dark Mode:**  
+   Switch between light and dark themes according to your preference.
 
-   - Create and delete categories for better transaction organization.
+---
 
-4. **Filter by Date Range:**
+## 🌐 Deployment
 
-   - View transactions for specific periods (e.g., month, year).
-
-5. **Dark Mode:**
-   - Toggle between light and dark themes based on your preference.
+This project is deployed on **Vercel** and can be accessed [here](https://budget-tracker-wheat-phi.vercel.app).
 
 ---
 
 ## ⚖️ License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the MIT License.
 
 ---
 
@@ -68,4 +70,4 @@ Contributions are welcome! Feel free to fork the repository and submit pull requ
 
 ## 🛠️ Support
 
-For issues or feature requests, please open an issue in the [GitHub repository](https://github.com/davide-esposito/budget-tracker/issues).
+For issues or feature requests, please open an issue in the GitHub repository.
